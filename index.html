@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ABEFILM Repository</title>
+  <title>ABEFILM Registrations</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -28,27 +28,27 @@
       margin-bottom: 20px;
       padding: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
     }
     .user img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin-right: 15px;
-      border: 2px solid #1df147;
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
     }
-    .user-info {
-      flex: 1;
-    }
-    .user-info p {
+    .user p {
       margin: 5px 0;
+    }
+    .error {
+      text-align: center;
+      color: red;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>ABEFILM Users</h1>
+    <h1>ABEFILM User Registrations</h1>
     <div id="users"></div>
   </div>
 
@@ -61,25 +61,33 @@
       .then(files => {
         files.forEach(file => {
           if (file.name.endsWith('.json')) {
+            // Fetch user details from each JSON file
             fetch(file.download_url)
               .then(response => response.json())
               .then(user => {
                 const userElement = document.createElement('div');
                 userElement.className = 'user';
                 userElement.innerHTML = `
-                  <img src="https://raw.githubusercontent.com/ABEFILM-OFFICIAL/ABEFILM/main/img/${user.username}.png" alt="${user.username}">
-                  <div class="user-info">
-                    <p><strong>Username:</strong> ${user.username}</p>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Plan:</strong> ${user.plan}</p>
-                  </div>
+                  <p><strong>Username:</strong> ${user.username}</p>
+                  <p><strong>Password:</strong> ${user.password}</p>
+                  <p><strong>Email:</strong> ${user.email}</p>
+                  <p><strong>Plan:</strong> ${user.plan}</p>
+                  <p><strong>Receipt:</strong></p>
+                  <img src="https://raw.githubusercontent.com/ABEFILM-OFFICIAL/ABEFILM/main/img/${user.receipt}" alt="Payment Receipt">
                 `;
                 usersContainer.appendChild(userElement);
+              })
+              .catch(error => {
+                console.error('Error fetching user data:', error);
+                usersContainer.innerHTML += `<div class="error">Error loading user data for ${file.name}</div>`;
               });
           }
         });
       })
-      .catch(error => console.error('Error fetching user data:', error));
+      .catch(error => {
+        console.error('Error fetching files:', error);
+        usersContainer.innerHTML = `<div class="error">Failed to fetch user data. Please try again later.</div>`;
+      });
   </script>
 </body>
 </html>
